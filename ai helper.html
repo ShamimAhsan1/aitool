@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>এআই ও এজেন্ট ডিরেক্টরি</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0f17; --card:#131a26; --card2:#0f1520; --line:#223047;
+    --ink:#e8ecf4; --mut:#93a3ba; --acc:#7c9cff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Hind Siliguri","Nirmala UI","Inter",system-ui,sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:34px 20px 60px}
+
+  /* ---------- header ---------- */
+  header{text-align:center;margin-bottom:26px}
+  h1{
+    font-size:clamp(26px,4.5vw,40px);font-weight:700;line-height:1.25;
+    background:linear-gradient(90deg,#8ab4ff,#c08bff 55%,#ff8ba7);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{color:var(--mut);font-size:15.5px;margin-top:8px}
+  .count{display:inline-block;margin-top:14px;font-size:13px;color:var(--acc);
+         border:1px solid #2b3c5e;border-radius:999px;padding:5px 14px;background:#101828}
+
+  /* ---------- controls ---------- */
+  .searchbox{max-width:520px;margin:24px auto 0;position:relative}
+  .searchbox input{
+    width:100%;padding:13px 46px 13px 44px;border-radius:14px;font:inherit;font-size:15px;
+    background:var(--card);border:1px solid var(--line);color:var(--ink);outline:none;
+  }
+  .searchbox input:focus{border-color:var(--acc)}
+  .searchbox .mag{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--mut);font-size:16px}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+  .chip{
+    font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--mut);
+    background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 15px;
+    transition:all .15s;
+  }
+  .chip:hover{color:var(--ink);border-color:#3a4d70}
+  .chip.on{background:var(--acc);border-color:var(--acc);color:#0b0f17}
+  .pchip.on.free{background:#34c98e;border-color:#34c98e}
+  .pchip.on.freemium{background:#f5b544;border-color:#f5b544}
+  .pchip.on.paid{background:#ff6b81;border-color:#ff6b81}
+  .sep{width:1px;background:var(--line);margin:4px 6px}
+
+  /* ---------- grid & cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:16px;margin-top:30px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 18px 14px;
+    display:flex;flex-direction:column;gap:10px;transition:transform .15s,border-color .15s;
+  }
+  .card:hover{transform:translateY(-3px);border-color:#3a5078}
+  .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;row-gap:8px}
+  .icon{
+    width:54px;height:54px;border-radius:14px;background:#f4f6fa;flex:none;
+    display:grid;place-items:center;position:relative;overflow:hidden;
+  }
+  .icon img{width:32px;height:32px;object-fit:contain}
+  .icon.letter::after{
+    content:attr(data-letter);font-family:Inter,sans-serif;font-weight:800;font-size:22px;color:#33415e;
+  }
+  .name{min-width:0}
+  .name b{font-family:Inter,"Hind Siliguri",sans-serif;font-size:16.5px;font-weight:700;display:block}
+  .cat{font-size:12px;color:var(--mut);margin-top:2px}
+  .price{
+    margin-left:auto;flex:none;font-size:12px;font-weight:700;border-radius:999px;padding:4px 11px;
+  }
+  .price.free{background:rgba(52,201,142,.14);color:#4cd9a2;border:1px solid rgba(52,201,142,.35)}
+  .price.freemium{background:rgba(245,181,68,.13);color:#ffc45e;border:1px solid rgba(245,181,68,.35)}
+  .price.paid{background:rgba(255,107,129,.13);color:#ff8798;border:1px solid rgba(255,107,129,.35)}
+  .pn{font-size:12.5px;color:var(--mut);margin-top:-6px}
+
+  .row{font-size:14px;line-height:1.75}
+  .row .lb{
+    display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.02em;
+    border-radius:6px;padding:1px 8px;margin-right:7px;vertical-align:1px;
+  }
+  .lb.w{background:#1b2a4a;color:#8ab4ff}   /* এটা কী */
+  .lb.u{background:#12324a;color:#5fd4f5}   /* কাজে লাগে */
+  .lb.b{background:#173326;color:#5fe0a1}   /* সুবিধা */
+  .visit{
+    margin-top:auto;align-self:flex-start;text-decoration:none;font-size:13px;font-weight:600;
+    color:var(--acc);border:1px solid #2b3c5e;border-radius:10px;padding:6px 14px;transition:all .15s;
+  }
+  .visit:hover{background:var(--acc);color:#0b0f17;border-color:var(--acc)}
+
+  .empty{text-align:center;color:var(--mut);padding:60px 0;font-size:15px}
+  footer{margin-top:46px;text-align:center;color:#5b6b84;font-size:13px;line-height:1.9}
+
+  /* ---------- owner / about section ---------- */
+  .owner{
+    margin-top:48px;border:1px solid var(--line);border-radius:22px;padding:34px 24px 30px;
+    background:linear-gradient(165deg,#151d2e,#0f1520 65%);text-align:center;position:relative;overflow:hidden;
+  }
+  .owner::before{
+    content:"";position:absolute;left:50%;top:-90px;transform:translateX(-50%);
+    width:420px;height:200px;pointer-events:none;
+    background:radial-gradient(closest-side,rgba(124,156,255,.20),transparent 70%);
+  }
+  .owner .avatar{
+    width:86px;height:86px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;
+    font-family:Inter,sans-serif;font-weight:800;font-size:29px;color:#0b0f17;
+    background:linear-gradient(135deg,#8ab4ff,#c08bff 55%,#ff8ba7);
+    box-shadow:0 10px 30px rgba(124,156,255,.35);
+  }
+  .owner .madeby{color:var(--mut);font-size:13.5px}
+  .owner h2{
+    font-family:Inter,"Hind Siliguri",sans-serif;font-size:clamp(24px,3.6vw,32px);
+    font-weight:800;margin-top:6px;letter-spacing:.01em;
+    background:linear-gradient(90deg,#e8ecf4,#c9d6f2);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .owner .roles{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:16px}
+  .role{font-size:13.5px;font-weight:600;border-radius:999px;padding:7px 17px;border:1px solid var(--line);background:var(--card)}
+  .role.r1{color:#8ab4ff;border-color:rgba(138,180,255,.45)}
+  .role.r2{color:#ff8ba7;border-color:rgba(255,139,167,.45)}
+  .role.r3{color:#ffc45e;border-color:rgba(255,196,94,.45)}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:560px){
+    .wrap{padding:22px 13px 40px}
+    .sub{font-size:14px}
+    .searchbox input{padding:11px 16px 11px 40px;font-size:14px;border-radius:12px}
+    .chip{font-size:12.5px;padding:6px 12px}
+    .filters{margin-top:14px}
+    .grid{gap:12px;margin-top:22px}
+    .card{padding:14px 14px 12px;border-radius:16px;gap:8px}
+    .icon{width:46px;height:46px;border-radius:12px}
+    .icon img{width:27px;height:27px}
+    .name b{font-size:15px}
+    .cat{font-size:11.5px}
+    .price{font-size:11px;padding:3px 9px}
+    .pn{font-size:11.5px}
+    .row{font-size:13.2px;line-height:1.72}
+    .row .lb{font-size:10.5px;padding:1px 7px}
+    .visit{font-size:12.5px;padding:6px 13px}
+    .owner{padding:28px 16px 26px;border-radius:18px}
+    .role{font-size:12.5px;padding:6px 13px}
+    footer{font-size:12px}
+  }
+  @media (min-width:1500px){
+    .grid{gap:20px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>জনপ্রিয় এআই ও এজেন্ট ডিরেক্টরি</h1>
+    <div class="sub">প্রতিটি এআই-এর পরিচিতি, কী কাজে লাগে, ব্যবহারের সুবিধা ও দাম — এক জায়গায়</div>
+    <div class="count" id="count"></div>
+  </header>
+
+  <div class="searchbox">
+    <span class="mag">🔍</span>
+    <input id="q" type="text" placeholder="এআই খুঁজুন… (যেমন: ছবি, ভিডিও, কোডিং, agent)">
+  </div>
+
+  <div class="filters" id="catChips"></div>
+  <div class="filters" id="priceChips"></div>
+
+  <main class="grid" id="grid"></main>
+  <div class="empty" id="empty" hidden>কিছু পাওয়া যায়নি — অন্য শব্দ দিয়ে খুঁজে দেখুন 🔍</div>
+
+  <section class="owner" id="about">
+    <div class="avatar">SA</div>
+    <div class="madeby">এই অ্যাপটি ডিজাইন ও ডেভেলপ করেছেন</div>
+    <h2>Shamim Ahsan</h2>
+    <div class="roles">
+      <span class="role r1">Graphic Designer</span>
+      <span class="role r2">Video Editor</span>
+      <span class="role r3">AI Student — 2nd Batch</span>
+    </div>
+  </section>
+
+  <footer>
+    আইকনগুলো সংশ্লিষ্ট কোম্পানির অফিসিয়াল লোগো — শেখা ও তথ্যদানের উদ্দেশ্যে ব্যবহৃত।<br>
+    দাম ও প্ল্যান যেকোনো সময় বদলাতে পারে — ব্যবহারের আগে অফিসিয়াল সাইটে যাচাই করে নিন · ২০২৬<br>
+    © ২০২৬ Shamim Ahsan
+  </footer>
+</div>
+
+<script>
+'use strict';
+/* ================= data ================= */
+const CATS={
+  chat:{l:"চ্যাট ও সহকারী",c:"#60a5fa"},
+  image:{l:"ছবি তৈরি",c:"#c08bff"},
+  video:{l:"ভিডিও",c:"#ff8ba7"},
+  audio:{l:"অডিও ও মিউজিক",c:"#5fd4f5"},
+  code:{l:"কোডিং ও ডেভ",c:"#5fe0a1"},
+  agent:{l:"এজেন্ট ও অটোমেশন",c:"#ffb066"},
+  prod:{l:"প্রোডাক্টিভিটি",c:"#a5b4fc"},
+};
+const PRICES={free:"ফ্রি",freemium:"ফ্রিমিয়াম",paid:"পেইড"};
+
+const AI=[
+ {n:"ChatGPT",d:"openai.com",s:"openai",c:"chat",p:"freemium",pn:"ফ্রি ব্যবহার • Plus $২০/মাস",
+  w:"OpenAI-এর কথা বোঝা-বোঝানো এআই সহকারী — পৃথিবীর সবচেয়ে জনপ্রিয় এআই।",
+  u:"লেখালেখি · অনুবাদ · কোডিং · ছবি তৈরি · পড়াশোনায় প্রশ্নোত্তর",
+  b:"এক জায়গায় প্রায় সব কাজ — বাংলা সহ ৫০+ ভাষা বোঝে, অ্যাপ ও ওয়েব দুটোতেই চলে।",k:"chatgpt openai চ্যাটবট লেখা"},
+ {n:"Claude",d:"claude.ai",s:"claude",c:"chat",p:"freemium",pn:"ফ্রি ব্যবহার • Pro $২০/মাস",
+  w:"Anthropic-এর এআই সহকারী — লেখালেখি, বিশ্লেষণ ও কোডিংয়ের জন্য বিশেষভাবে পরিচিত।",
+  u:"দীর্ঘ ডকুমেন্ট পড়া · রিপোর্ট · কোডিং · এজেন্টিক কাজ (Claude Code)",
+  b:"প্রাকৃতিক ও নিরাপদ উত্তর; বড় ফাইল দিয়ে সারসংক্ষেপ ও কোডিংয়ে সেরাদের একটি।",k:"claude anthropic ক্লড"},
+ {n:"Google Gemini",d:"gemini.google.com",s:"googlegemini",c:"chat",p:"freemium",pn:"ফ্রি ব্যবহার • Advanced $১৯.৯৯/মাস",
+  w:"Google-এর সবচেয়ে শক্তিশালী এআই মডেল — Search ও Android-এর সাথে যুক্ত।",
+  u:"প্রশ্নোত্তর · ছবি/ভিডিও বোঝা · Gmail-Docs-এ সহায়তা · ছবি তৈরি",
+  b:"Google-এর সেবার সাথে সরাসরি কাজ করে; টেক্সট-ছবি-অডিও-ভিডিও সব বোঝে।",k:"gemini google বার্ড বার্ড"},
+ {n:"Microsoft Copilot",d:"copilot.microsoft.com",s:"microsoftcopilot",c:"chat",p:"freemium",pn:"ফ্রি ব্যবহার • Pro $২০/মাস",
+  w:"Microsoft-এর এআই সহকারী — Windows ও Office-এর সাথে বিল্ট-ইন।",
+  u:"Word-Excel-PowerPoint-এ সহায়তা · ওয়েব সার্চ · ছবি তৈরি",
+  b:"অফিসের কাজ অনেক দ্রুত হয় — ফ্রিতেই শক্তিশালী মডেল পাওয়া যায়।",k:"copilot microsoft অফিস"},
+ {n:"Meta AI",d:"meta.ai",s:"meta",c:"chat",p:"free",pn:"সম্পূর্ণ ফ্রি",
+  w:"Meta-র এআই সহকারী — WhatsApp, Instagram আর Facebook-এর ভেতরেই।",
+  u:"চ্যাটে প্রশ্ন করা · ছবি তৈরি · অনুবাদ · পরামর্শ",
+  b:"আলাদা অ্যাপ লাগে না — যে অ্যাপ ব্যবহার করেন, সেখানেই পাওয়া যায়।",k:"meta whatsapp instagram ফেসবুক"},
+ {n:"Grok",d:"grok.com",s:"xai",c:"chat",p:"freemium",pn:"সীমিত ফ্রি • SuperGrok $৩০/মাস",
+  w:"Elon Musk-এর xAI কোম্পানির এআই — X (টুইটার)-এর সাথে যুক্ত।",
+  u:"রিয়েল-টাইম খবর · সাহসী/খোলামেলা উত্তর · ছবি তৈরি",
+  b:"X-এ এইমাত্র কী ঘটছে, তা সাথে সাথে জেনে উত্তর দিতে পারে।",k:"grok xai elon টুইটার x"},
+ {n:"DeepSeek",d:"chat.deepseek.com",s:"",c:"chat",p:"free",pn:"ফ্রি • API-তে অত্যন্ত সস্তা",
+  w:"চীনের ওপেন-সোর্স এআই — কম খরচে প্রায় ChatGPT-সমান ক্ষমতা।",
+  u:"চ্যাট · কোডিং · গণিত ও যুক্তির সমাধান",
+  b:"ওপেন সোর্স ও অত্যন্ত সস্তা — ডেভেলপারদের কাছে API-এর জনপ্রিয় পছন্দ।",k:"deepseek চীন ওপেন সোর্স"},
+ {n:"Perplexity",d:"perplexity.ai",s:"perplexity",c:"chat",p:"freemium",pn:"ফ্রি ব্যবহার • Pro $২০/মাস",
+  w:"AI সার্চ ইঞ্জিন — Google-এর মতো খোঁজে, কিন্তু সোজা উত্তর দেয়, সূত্রসহ।",
+  u:"রিসার্চ · খবর · তথ্য যাচাই · রেফারেন্সসহ উত্তর",
+  b:"প্রতিটি উত্তরের উৎস/লিংক দেখায় — তাই তথ্য নিয়ে বিশ্বাস রাখা যায়।",k:"perplexity সার্চ রিসার্চ"},
+ {n:"Qwen",d:"qwen.ai",s:"",c:"chat",p:"free",pn:"সম্পূর্ণ ফ্রি",
+  w:"Alibaba-র ওপেন-সোর্স এআই পরিবার — বহু ভাষায় দক্ষ।",
+  u:"চ্যাট · কোডিং · ছবি ও ভিডিও বোঝা",
+  b:"ওয়েব চ্যাট সম্পূর্ণ ফ্রি; শক্তিশালী ওপেন মডেল নিজে হোস্টও করা যায়।",k:"qwen alibaba ওয়েন"},
+
+ {n:"Midjourney",d:"midjourney.com",s:"",c:"image",p:"paid",pn:"$১০/মাস থেকে (ফ্রি ট্রায়াল নেই)",
+  w:"এআই ইমেজ জেনারেটরের রাজা — শিল্পসম্মত ছবির জন্য সবচেয়ে বিখ্যাত।",
+  u:"ডিজিটাল আর্ট · পোস্টার · লোগো ধারণা · বিজ্ঞাপনের ছবি",
+  b:"ছবির মান ও নান্দনিকতায় এখনো অগ্রণী — ডিজাইনারদের প্রিয়।",k:"midjourney ছবি আর্ট ইমেজ"},
+ {n:"Stable Diffusion",d:"stability.ai",s:"stablediffusion",c:"image",p:"free",pn:"ওপেন সোর্স • ক্লাউড টুলে ফ্রিমিয়াম",
+  w:"Stability AI-র ওপেন-সোর্স ইমেজ মডেল — নিজের পিসিতেই চালানো যায়।",
+  u:"ছবি তৈরি · ছবি সম্পাদনা · নিজস্ব স্টাইলে মডেল ট্রেনিং",
+  b:"সম্পূর্ণ ফ্রি ও নিয়ন্ত্রণ আপনার হাতে — প্রাইভেসি নিয়ে চিন্তা নেই।",k:"stable diffusion স্টেবিলিটি ছবি"},
+ {n:"Ideogram",d:"ideogram.ai",s:"",c:"image",p:"freemium",pn:"দৈনিক ফ্রি • Plus $৮/মাস",
+  w:"ছবির ভেতরে লেখা (টেক্সট) সবচেয়ে ভালোভাবে বসাতে পারা এআই।",
+  u:"লোগো · পোস্টার · টাইপোগ্রাফি-সহ ছবি · মিম",
+  b:"ছবির ভেতরের লেখা পরিষ্কার ও বানান-ঠিক আসে — অন্যদের এখানে সমস্যা হয়।",k:"ideogram লোগো টেক্সট পোস্টার"},
+ {n:"Leonardo AI",d:"leonardo.ai",s:"",c:"image",p:"freemium",pn:"দৈনিক ফ্রি টোকেন • পেইড প্ল্যান",
+  w:"গেম ও ডিজাইনারদের জন্য বানানো শক্তিশালী এআই ইমেজ প্ল্যাটফর্ম।",
+  u:"গেম অ্যাসেট · কনসেপ্ট আর্ট · ছবি এডিট ও আপস্কেল",
+  b:"ফ্রি কোটা প্রতিদিন পাওয়া যায়; স্টাইল ও ডিটেইল নিয়ন্ত্রণ চমৎকার।",k:"leonardo গেম কনসেপ্ট আর্ট"},
+ {n:"Canva AI",d:"canva.com",s:"canva",c:"image",p:"freemium",pn:"ফ্রি • Pro $১৫/মাস",
+  w:"জনপ্রিয় ডিজাইন অ্যাপ Canva-র ভেতরের AI ফিচার (Magic Studio)।",
+  u:"পোস্টার/প্রেজেন্টেশন · ব্যাকগ্রাউন্ড রিমুভ · ম্যাজিক রাইট · ছবি তৈরি",
+  b:"ডিজাইন না জানলেও পেশাদারমানের ডিজাইন মিনিটেই হয়ে যায়।",k:"canva ডিজাইন পোস্টার ম্যাজিক"},
+
+ {n:"Sora",d:"sora.com",s:"",c:"video",p:"paid",pn:"ChatGPT Plus/Pro সাবস্ক্রিপশনে",
+  w:"OpenAI-র টেক্সট-থেকে-ভিডিও মডেল — বাক্য লিখলেই সিনেমার দৃশ্যের মতো ভিডিও।",
+  u:"ছোট ভিডিও · বিজ্ঞাপন · কনটেন্ট তৈরি",
+  b:"ক্যামেরা বা এডিটিং ছাড়াই বাস্তবসম্মত ভিডিও তৈরি হয়।",k:"sora ভিডিও টেক্সট"},
+ {n:"Runway",d:"runwayml.com",s:"",c:"video",p:"freemium",pn:"সীমিত ফ্রি • $১৫/মাস থেকে",
+  w:"প্রফেশনালদের AI ভিডিও টুল — ভিডিও তৈরি ও এডিটিং দুটোই।",
+  u:"টেক্সট-থেকে-ভিডিও · ব্যাকগ্রাউন্ড রিমুভ · মোশন ব্রাশ · এফেক্ট",
+  b:"হলিউড-স্টাইল এফেক্ট ক্যামেরা ছাড়াই সম্ভব — ক্রিয়েটরদের প্রিয়।",k:"runway ভিডিও এডিট এফেক্ট"},
+ {n:"HeyGen",d:"heygen.com",s:"",c:"video",p:"freemium",pn:"ফ্রি ট্রায়াল • $২৯/মাস থেকে",
+  w:"AI অ্যাভাটার দিয়ে কথা বলা ভিডিও বানানোর টুল।",
+  u:"মার্কেটিং ভিডিও · টিউটোরিয়াল · ভিডিও অনুবাদ (ঠোঁট-মিলিয়ে)",
+  b:"নিজে ক্যামেরার সামনে না গিয়েই ভিডিও; ৩০+ ভাষায় অনুবাদ করে দেয়।",k:"heygen অ্যাভাটার ভিডিও ডাবিং"},
+ {n:"Pika",d:"pika.art",s:"",c:"video",p:"freemium",pn:"ফ্রি ক্রেডিট • $১০/মাস থেকে",
+  w:"মজার ও সহজ টেক্সট/ছবি-থেকে-ভিডিও এআই।",
+  u:"সোশ্যাল মিডিয়ার ক্লিপ · অ্যানিমেশন ইফেক্ট",
+  b:"একদম সহজ — একদম নতুন মানুষও মিনিটে ভিডিও বানাতে পারে।",k:"pika ভিডিও মজা সোশ্যাল"},
+
+ {n:"ElevenLabs",d:"elevenlabs.io",s:"",c:"audio",p:"freemium",pn:"১০ হাজার অক্ষর/মাস ফ্রি • $৫/মাস থেকে",
+  w:"সবচেয়ে বাস্তবসম্মত AI ভয়েস — লেখা পড়ে মানুষের মতো কথা বলে।",
+  u:"ভয়েসওভার · অডিওবুক · ভিডিও ডাবিং · নিজের কণ্ঠের ক্লোন",
+  b:"৩০+ ভাষায় প্রাকৃতিক কণ্ঠ — ইউটিউবার ও কনটেন্ট মেকারদের প্রিয়।",k:"elevenlabs ভয়েস কণ্ঠ অডিও"},
+ {n:"Suno",d:"suno.com",s:"",c:"audio",p:"freemium",pn:"দৈনিক ফ্রি ক্রেডিট • $১০/মাস থেকে",
+  w:"লিরিক্স দিলেই পুরো গান (কণ্ঠসহ) বানিয়ে দেওয়া এআই।",
+  u:"গান রচনা · ব্যাকগ্রাউন্ড মিউজিক · জিঙ্গেল",
+  b:"সুর বা যন্ত্র বাজানো না জেনেও রেডি-টু-শেয়ার গান পাওয়া যায়।",k:"suno গান মিউজিক লিরিক্স"},
+
+ {n:"GitHub Copilot",d:"github.com/features/copilot",s:"githubcopilot",c:"code",p:"freemium",pn:"ফ্রি টায়ার • Pro $১০/মাস (ছাত্রদের ফ্রি)",
+  w:"বিশ্বের সবচেয়ে জনপ্রিয় AI কোডিং সহকারী — GitHub-এর।",
+  u:"কোড অটোকমপ্লিট · ফাংশন লেখা · বাগ ফিক্স · কোডের ব্যাখ্যা",
+  b:"কোডিংয়ের সময় অর্ধেকে নামে; VS Code-এ সরাসরি চলে।",k:"copilot github কোড প্রোগ্রামিং"},
+ {n:"Cursor",d:"cursor.com",s:"",c:"code",p:"freemium",pn:"ফ্রি টায়ার • Pro $২০/মাস",
+  w:"AI-ফার্স্ট কোড এডিটর — পুরো প্রজেক্ট বুঝে কাজ করে।",
+  u:"কোড লেখা/রিফ্যাক্টর · বাগ খোঁজা · পুরো ফিচার এক কথায় জেনারেট",
+  b:"এডিটরের ভেতরেই এজেন্টিক কোডিং — প্রোগ্রামারদের এখনকার প্রিয় এডিটর।",k:"cursor এডিটর কোড এজেন্ট"},
+ {n:"Replit",d:"replit.com",s:"replit",c:"code",p:"freemium",pn:"ফ্রি টায়ার • Core $২৫/মাস",
+  w:"ব্রাউজারেই কোড লেখা, চালানো ও ডিপ্লয় করার প্ল্যাটফর্ম — AI এজেন্টসহ।",
+  u:"অ্যাপ বানানো · কোডিং শেখা · সরাসরি হোস্টিং",
+  b:"কোনো সেটআপ ছাড়াই ফোন বা ট্যাব থেকেই অ্যাপ বানানো যায়।",k:"replit কোড অ্যাপ শেখা"},
+ {n:"Hugging Face",d:"huggingface.co",s:"huggingface",c:"code",p:"free",pn:"প্রায় সব ফ্রি",
+  w:"ওপেন-সোর্স AI মডেলের বিশাল হাব — এআই-এর মূল ভাণ্ডার।",
+  u:"হাজারো ফ্রি মডেল · ডেমো চালানো (Spaces) · ডেটাসেট",
+  b:"এআই শিখতে বা নিজে কিছু বানাতে চাইলে সবকিছু এক জায়গায়, প্রায় সবই ফ্রি।",k:"huggingface মডেল ওপেন সোর্স"},
+
+ {n:"Manus",d:"manus.im",s:"",c:"agent",p:"paid",pn:"ক্রেডিট-ভিত্তিক • $১৯/মাস থেকে",
+  w:"নিজে নিজে কাজ করা জেনারেল AI এজেন্ট — রিসার্চ থেকে রিপোর্ট পর্যন্ত সব একা করে।",
+  u:"মার্কেট রিসার্চ · ডেটা বিশ্লেষণ · ওয়েবসাইট বানানো · প্ল্যানিং",
+  b:"শুধু নির্দেশ দিন — ধাপগুলো নিজে সাজিয়ে কাজ শেষ করে ফলাফল দেয়।",k:"manus এজেন্ট অটোমেশন কাজ"},
+ {n:"Devin",d:"devin.ai",s:"",c:"agent",p:"paid",pn:"$২০/মাস থেকে",
+  w:"নিজেকে 'AI সফটওয়্যার ইঞ্জিনিয়ার' বলা Cognition-এর এজেন্ট।",
+  u:"সম্পূর্ণ প্রজেক্ট কোডিং · বাগ ফিক্স · পুল-রিকোয়েস্ট তৈরি",
+  b:"টিমের সদস্যের মতো কাজ ভাগ নেয়; টার্মিনাল, ব্রাউজার, এডিটর নিজেই চালায়।",k:"devin cognition ইঞ্জিনিয়ার কোড"},
+ {n:"AutoGPT",d:"agpt.co",s:"",c:"agent",p:"free",pn:"ওপেন সোর্স",
+  w:"ইতিহাসের প্রথম ভাইরাল AI এজেন্ট ফ্রেমওয়ার্ক — লক্ষ্য দিলে নিজে প্ল্যান করে।",
+  u:"স্বয়ংক্রিয় কাজের চেইন · গবেষণা · নিজের এজেন্ট বানানো",
+  b:"ফ্রি ও ওপেন সোর্স — AI এজেন্ট শেখার সেরা শুরু।",k:"autogpt এজেন্ট ওপেন সোর্স"},
+ {n:"n8n",d:"n8n.io",s:"n8n",c:"agent",p:"freemium",pn:"সেলফ-হোস্ট ফ্রি • ক্লাউড €২০/মাস থেকে",
+  w:"অ্যাপগুলো সংযুক্ত করে AI অটোমেশন ওয়ার্কফ্লো বানানোর টুল।",
+  u:"AI এজেন্ট ওয়ার্কফ্লো · ডেটা পাইপলাইন · বিজনেস অটোমেশন",
+  b:"নিজে হোস্ট করলে একদম ফ্রি; ৪০০+ অ্যাপের ইন্টিগ্রেশন আছে।",k:"n8n অটোমেশন ওয়ার্কফ্লো"},
+ {n:"Zapier",d:"zapier.com",s:"zapier",c:"agent",p:"freemium",pn:"১০০ টাস্ক/মাস ফ্রি • $১৯.৯৯/মাস থেকে",
+  w:"কোডিং ছাড়াই অ্যাপ-টু-অ্যাপ অটোমেশনের সবচেয়ে জনপ্রিয় টুল — এখন AI এজেন্টসহ।",
+  u:"Gmail-Sheets-Slack অটোমেশন · AI অ্যাকশন · চ্যাটবট",
+  b:"৮০০০+ অ্যাপের সাথে কাজ করে; মিনিটেই অটোমেশন দাঁড়িয়ে যায়।",k:"zapier অটোমেশন অ্যাপ"},
+
+ {n:"NotebookLM",d:"notebooklm.google.com",s:"",c:"prod",p:"free",pn:"সম্পূর্ণ ফ্রি",
+  w:"Google-এর স্টাডি এআই — আপনার ডকুমেন্ট দিয়ে নোট, কুইজ, এমনকি পডকাস্ট বানায়।",
+  u:"পড়ার নোট · সারসংক্ষেপ · অডিও ওভারভিউ (রিভিশনের জন্য)",
+  b:"উত্তর শুধু আপনার দেওয়া বই/নোট থেকেই — ভুল তথ্যের ভয় অনেক কম।",k:"notebooklm পড়া নোট স্টাডি"},
+ {n:"Notion AI",d:"notion.so",s:"notion",c:"prod",p:"freemium",pn:"অ্যাড-অন $১০/মাস",
+  w:"নোট ও ডকুমেন্ট অ্যাপ Notion-এর ভেতরে বসানো AI সহকারী।",
+  u:"নোটের সারাংশ · লেখা ঠিক করা · টেবিল/রিপোর্ট জেনারেট · অনুবাদ",
+  b:"নোট লেখার অ্যাপেই AI আছে — আলাদা টুলে যাওয়া লাগে না।",k:"notion নোট ডকুমেন্ট লেখা"},
+ {n:"Gamma",d:"gamma.app",s:"",c:"prod",p:"freemium",pn:"৪০০ ক্রেডিট ফ্রি • $১০/মাস থেকে",
+  w:"সেকেন্ডেই সুন্দর প্রেজেন্টেশন ও ডকুমেন্ট বানিয়ে দেওয়া এআই।",
+  u:"স্লাইড · ওয়েবপেজ · রিপোর্ট",
+  b:"PowerPoint-এ ঘণ্টা নষ্ট নয় — টপিক লিখলেই রেডি ডেক সাজানো।",k:"gamma প্রেজেন্টেশন স্লাইড"},
+ {n:"QuillBot",d:"quillbot.com",s:"",c:"prod",p:"freemium",pn:"ফ্রি • Premium $৯.৯৫/মাস",
+  w:"লেখা রিরাইট, সারাংশ ও গ্রামার ঠিক করার জনপ্রিয় টুল।",
+  u:"প্যারাফ্রেজিং · সামারাইজার · গ্রামার চেক · প্ল্যাজিয়ারিজম চেক",
+  b:"অ্যাসাইনমেন্ট ও ইংরেজি লেখায় ছাত্রছাত্রীদের বড় ভরসা।",k:"quillbot রিরাইট গ্রামার অ্যাসাইনমেন্ট"},
+];
+
+/* ================= render ================= */
+const $=id=>document.getElementById(id);
+const bnDigits=n=>String(n).replace(/\d/g,d=>"০১২৩৪৫৬৭৮৯"[d]);
+let cat="all",price="all";
+
+function iconHTML(a){
+  const primary=a.s?`https://cdn.simpleicons.org/${a.s}`:`https://www.google.com/s2/favicons?domain=${a.d}&sz=128`;
+  const fallback=`https://www.google.com/s2/favicons?domain=${a.d}&sz=128`;
+  return `<div class="icon" data-letter="${a.n[0]}">
+    <img src="${primary}" alt="${a.n}" loading="lazy"
+      onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${fallback}';}else{this.remove();this.parentElement.classList.add('letter');}">
+  </div>`;
+}
+function cardHTML(a){
+  return `<article class="card">
+    <div class="top">
+      ${iconHTML(a)}
+      <div class="name"><b>${a.n}</b><div class="cat" style="color:${CATS[a.c].c}">${CATS[a.c].l}</div></div>
+      <span class="price ${a.p}">${PRICES[a.p]}</span>
+    </div>
+    <div class="pn">${a.pn}</div>
+    <div class="row"><span class="lb w">এটা কী?</span>${a.w}</div>
+    <div class="row"><span class="lb u">কাজে লাগে</span>${a.u}</div>
+    <div class="row"><span class="lb b">সুবিধা</span>${a.b}</div>
+    <a class="visit" href="https://${a.d}" target="_blank" rel="noopener">অফিসিয়াল সাইট ↗</a>
+  </article>`;
+}
+function render(){
+  const q=$("q").value.trim().toLowerCase();
+  const list=AI.filter(a=>
+    (cat==="all"||a.c===cat)&&
+    (price==="all"||a.p===price)&&
+    (!q||(a.n+" "+a.k+" "+CATS[a.c].l+" "+a.w+" "+a.u).toLowerCase().includes(q))
+  );
+  $("grid").innerHTML=list.map(cardHTML).join("");
+  $("empty").hidden=list.length>0;
+  $("count").textContent=`${bnDigits(list.length)}টি এআই ও এজেন্ট`;
+}
+/* chips */
+function buildChips(){
+  const cc=[["all","সব"],...Object.entries(CATS).map(([k,v])=>[k,v.l])];
+  $("catChips").innerHTML=cc.map(([k,l])=>
+    `<button class="chip${k==="all"?" on":""}" data-k="${k}">${l}</button>`).join("");
+  const pc=[["all","সব দাম"],["free","ফ্রি"],["freemium","ফ্রিমিয়াম"],["paid","পেইড"]];
+  $("priceChips").innerHTML=pc.map(([k,l])=>
+    `<button class="chip pchip ${k}${k==="all"?" on":""}" data-k="${k}">${l}</button>`).join("");
+  $("catChips").addEventListener("click",e=>{
+    const b=e.target.closest(".chip");if(!b)return;
+    cat=b.dataset.k;
+    [...$("catChips").children].forEach(c=>c.classList.toggle("on",c===b));
+    render();
+  });
+  $("priceChips").addEventListener("click",e=>{
+    const b=e.target.closest(".chip");if(!b)return;
+    price=b.dataset.k;
+    [...$("priceChips").children].forEach(c=>c.classList.toggle("on",c===b));
+    render();
+  });
+}
+buildChips();
+$("q").addEventListener("input",render);
+render();
+</script>
+</body>
+</html>
